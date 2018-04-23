@@ -756,10 +756,14 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
     case NGX_HTTP_IMAGE_WEBP:
 
         if (ctx->length < 30) {
+            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                      "image_filter: ctx->length < 30");
             return NGX_DECLINED;
         }
 
         if (p[12] != 'V' || p[13] != 'P' || p[14] != '8') {
+            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                      "image_filter: not VP8 ");            
             return NGX_DECLINED;
         }
 
@@ -768,11 +772,15 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
         case ' ':
             if (p[20] & 1) {
                 /* not a key frame */
+            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                      "image_filter: not a key frame ");                  
                 return NGX_DECLINED;
             }
 
             if (p[23] != 0x9d || p[24] != 0x01 || p[25] != 0x2a) {
                 /* invalid start code */
+            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                      "image_filter: invalid start code");                  
                 return NGX_DECLINED;
             }
 
@@ -784,6 +792,8 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
         case 'L':
             if (p[20] != 0x2f) {
                 /* invalid signature */
+            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                      "image_filter: invalid signature");                  
                 return NGX_DECLINED;
             }
 
@@ -798,13 +808,16 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
             break;
 
         default:
+            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                      "image_filter: default 1");                 
             return NGX_DECLINED;
         }
 
         break;
 
     default:
-
+            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                      "image_filter: default 2");  
         return NGX_DECLINED;
     }
 
