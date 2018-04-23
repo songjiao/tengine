@@ -428,6 +428,8 @@ ngx_http_image_test(ngx_http_request_t *r, ngx_chain_t *in)
     p = in->buf->pos;
 
     if (in->buf->last - p < 16) {
+        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
+                   "image filter NGX_HTTP_IMAGE_NONE buf<16: \"%c%c\"", p[0], p[1]);
         return NGX_HTTP_IMAGE_NONE;
     }
 
