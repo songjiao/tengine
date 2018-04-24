@@ -1144,8 +1144,7 @@ ngx_http_image_source(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
 
     if (img == NULL) {
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, failed);
-        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "image size: %d ", (int) ctx->length);        
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "image size: %d ", (int) ctx->length);          
     }
 
     return img;
