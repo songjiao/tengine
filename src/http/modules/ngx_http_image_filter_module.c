@@ -428,8 +428,6 @@ ngx_http_image_test(ngx_http_request_t *r, ngx_chain_t *in)
     p = in->buf->pos;
 
     if (in->buf->last - p < 16) {
-        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-                   "image filter NGX_HTTP_IMAGE_NONE buf<16: \"%c%c\"", p[0], p[1]);
         return NGX_HTTP_IMAGE_NONE;
     }
 
@@ -756,14 +754,10 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
     case NGX_HTTP_IMAGE_WEBP:
 
         if (ctx->length < 30) {
-            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "image_filter: ctx->length < 30");
             return NGX_DECLINED;
         }
 
         if (p[12] != 'V' || p[13] != 'P' || p[14] != '8') {
-            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "image_filter: not VP8 ");            
             return NGX_DECLINED;
         }
 
@@ -772,15 +766,11 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
         case ' ':
             if (p[20] & 1) {
                 /* not a key frame */
-            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "image_filter: not a key frame ");                  
                 return NGX_DECLINED;
             }
 
             if (p[23] != 0x9d || p[24] != 0x01 || p[25] != 0x2a) {
                 /* invalid start code */
-            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "image_filter: invalid start code");                  
                 return NGX_DECLINED;
             }
 
@@ -792,8 +782,6 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
         case 'L':
             if (p[20] != 0x2f) {
                 /* invalid signature */
-            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "image_filter: invalid signature");                  
                 return NGX_DECLINED;
             }
 
@@ -808,16 +796,13 @@ ngx_http_image_size(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
             break;
 
         default:
-            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "image_filter: default 1");                 
             return NGX_DECLINED;
         }
 
         break;
 
     default:
-            ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-                      "image_filter: default 2");  
+
         return NGX_DECLINED;
     }
 
@@ -1133,7 +1118,7 @@ ngx_http_image_source(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
         img = gdImageCreateFromWebpPtr(ctx->length, ctx->image);
         failed = "gdImageCreateFromWebpPtr() failed";
 #else
-        failed = "nginx was built without GD WebP support/gdImageCreateFromWebpPtr() failed";
+        failed = "nginx was built without GD WebP support";
 #endif
         break;
 
@@ -1143,7 +1128,7 @@ ngx_http_image_source(ngx_http_request_t *r, ngx_http_image_filter_ctx_t *ctx)
     }
 
     if (img == NULL) {
-        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, failed);        
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, failed);
     }
 
     return img;
@@ -1225,7 +1210,7 @@ ngx_http_image_out(ngx_http_request_t *r, ngx_uint_t type, gdImagePtr img,
         out = gdImageWebpPtrEx(img, size, q);
         failed = "gdImageWebpPtrEx() failed";
 #else
-        failed = "nginx was built without GD WebP support/gdImageWebpPtrEx() failed";
+        failed = "nginx was built without GD WebP support";
 #endif
         break;
 
